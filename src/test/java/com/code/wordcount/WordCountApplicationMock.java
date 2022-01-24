@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,14 +22,30 @@ public class WordCountApplicationMock {
 	}
 
 	@Test
-	public void test_non_alphabetic() {
+	public void testNonAlphabetic() {
 		WordCountController wordCountController = new WordCountController(translator);
 		wordCountController.addWord("Un624*!@#m()");
 		assertEquals(0,wordCountController.getWordCount("Un624*!@#m()"));
 	}
 
 	@Test
-	public void test_All() {
+	public void testOtherLanguage() {
+		when(translator.translateWord("Guten")).thenReturn("Good");
+		when(translator.translateWord("Maith")).thenReturn("Good");
+		when(translator.translateWord("Хорошо")).thenReturn("Good");
+		WordCountController wordCountController = new WordCountController(translator);
+
+		// When
+		wordCountController.addWord("Guten");
+		wordCountController.addWord("Maith");
+		wordCountController.addWord("Хорошо");
+
+		// Then
+		assertEquals(3,wordCountController.getWordCount("Good"));
+	}
+
+	@Test
+	public void testAllCases() {
 		// Given
 		when(translator.translateWord("Hallo")).thenReturn("Hello");
 		when(translator.translateWord("Cette")).thenReturn("This");
